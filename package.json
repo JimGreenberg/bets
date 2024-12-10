@@ -1,0 +1,25 @@
+{
+  "name": "bets",
+  "version": "2.0.0",
+  "description": "a GAMBLING slack app for the boys",
+  "type": "commonjs",
+  "module": "./src/app.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "bs": "npm run build && npm run start"
+  },
+  "author": "jim",
+  "license": "ISC",
+  "dependencies": {
+    "@slack/bolt": "^3.17.0",
+    "dotenv": "^16.3.1",
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.0.3"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.3.3"
+  }
+}
