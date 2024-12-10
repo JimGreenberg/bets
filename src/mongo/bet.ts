@@ -9,11 +9,15 @@ const UserBetSchema = new Schema({
   predictionText: String,
 });
 
+const USER_BET_MODEL_NAME = "user_bet";
+export const UserBet = model(USER_BET_MODEL_NAME, UserBetSchema);
+
 const BetSchema = new Schema({
+  channelId: { type: String, required: true },
   date: { type: Date, default: new Date() },
   description: { type: String, required: true },
   bets: [UserBetSchema],
 });
 
 const BET_MODEL_NAME = "bet";
-export default model(BET_MODEL_NAME, BetSchema);
+export const Bet = model(BET_MODEL_NAME, BetSchema);
