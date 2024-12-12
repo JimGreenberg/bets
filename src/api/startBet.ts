@@ -1,14 +1,16 @@
 import { App, Middleware, SlackCommandMiddlewareArgs } from "@slack/bolt";
+import { Bet } from "../types";
 import * as DB from "../mongo";
 import * as Errors from "../error";
 
 // const result = /^(.+)\s(\d+)\s?(.*)?$/.exec(text); // old regex for (description) (money) (prediction)
+export const START_BET_PATTERN = /^(.*?)\s(\d+)$/;
 interface Payload {
   description: string;
   money: number;
 }
 function parseText(text: string): Payload {
-  const result = /^(.*?)\s(\d+)$/;
+  const result = START_BET_PATTERN.exec(text);
   const description = result?.[1];
   const money = result?.[2];
   if (description && money) {
@@ -17,18 +19,19 @@ function parseText(text: string): Payload {
       money: parseInt(money),
     };
   }
-  throw new Errors.UnparseableError();
+  throw new Errors.UnparseableError(text);
 }
 
 export const startBet: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
   (app: App) =>
-  async ({ command, body: { text }, respond, say }) => {
+  async ({ command, body: { text, user_name }, respond, say }) => {
     const userId = command.user_id;
-    let betId: string;
+    let bet: Bet;
     const parsed = parseText(text);
     try {
-      betId = await DB.createBet({
+      bet = await DB.createBet({
         channelId: command.channel_id,
+        initiator: userId,
         ...parsed,
       });
     } catch (e) {
@@ -39,21 +42,7 @@ export const startBet: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
         replace_original: false,
       });
     }
-    const slackUser = await app.client.users.profile.get({ user: userId });
-    const user = {
-      id: userId,
-      name: slackUser.profile?.display_name!,
-      image: slackUser.profile?.image_24!,
-    };
-    if (!betId || !user.name || !user.image) {
-      return await respond({
-        response_type: "ephemeral",
-        text: "Error creating game :dingus:",
-        replace_original: false,
-      });
-    }
     await say({
-      // blocks: startView(),
-      text: `<!channel> <${user.id}> bet $${parsed.money} that ${parsed.description}`,
+      text: `<!channel> <${userId}> started a new bet for $${bet.money}: ${bet.description}. To join: \`/bet ${bet.code} <your prediction>\``,
     });
   };

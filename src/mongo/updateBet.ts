@@ -4,24 +4,26 @@ import * as Errors from "../error";
 
 interface UpdateBet {
   code: string;
-  userId: string;
+  slackUserId: string;
   prediction: string;
 }
 export async function updateBet({
   code,
-  userId,
+  slackUserId,
   prediction,
 }: UpdateBet): Promise<Bet> {
   const bet = await MongoBet.findOne({ code });
   if (!bet) {
     throw new Errors.NotFoundError("bet");
   }
-  const userBet = bet.userBets.find((userBet) => userBet.userId === userId);
+  const userBet = bet.userBets.find(
+    (userBet) => userBet.slackUserId === slackUserId
+  );
   if (userBet) {
     userBet.prediction = prediction;
   } else {
     bet.userBets.push({
-      userId,
+      slackUserId,
       prediction,
     });
   }

@@ -13,6 +13,7 @@ const BetSchema = new Schema({
   channelId: { type: String, required: true },
   code: { type: String, required: true, unique: true, default: generateCode },
   date: { type: Date, default: new Date() },
+  initiator: String,
   description: { type: String, required: true },
   money: { type: Number, required: true },
   userBets: { type: [UserBetSchema], default: [] },

@@ -7,7 +7,12 @@ export interface Bet {
 }
 
 export interface UserBet {
-  userId: string;
+  slackUserId: string;
   prediction: string;
   fulfilled?: boolean | null;
+}
+
+export interface User {
+  slackUserId: string;
+  money: number;
 }

@@ -2,7 +2,7 @@ import { model, Schema } from "mongoose";
 
 export const UserBetSchema = new Schema({
   date: { type: Date, default: new Date() },
-  userId: { type: String, required: true },
+  slackUserId: { type: String, required: true },
   prediction: { type: String, required: true },
   fulfilled: Boolean,
 });
