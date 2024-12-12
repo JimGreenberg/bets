@@ -3,7 +3,7 @@ import { Bet } from "../types";
 import * as DB from "../mongo";
 import * as Errors from "../error";
 
-export const JOIN_BET_PATTERN = /^([A-Z]{4})\s(.*)$/;
+export const JOIN_BET_PATTERN = /^([a-zA-Z]{4})\s(.*)$/;
 interface Payload {
   code: string;
   prediction: string;
@@ -14,7 +14,7 @@ function parseText(text: string): Payload {
   const prediction = result?.[2];
   if (code && prediction) {
     return {
-      code,
+      code: code.toUpperCase(),
       prediction,
     };
   }
@@ -24,11 +24,18 @@ function parseText(text: string): Payload {
 export const joinBet: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
   (app: App) =>
   async ({ command, body: { text }, respond, say }) => {
+    const channelId = command.channel_id;
     const slackUserId = command.user_id;
     const { code, prediction } = parseText(text);
-    const bet = await DB.MongoBet.findOne({ code });
-    const user = await DB.MongoUser.findOne({ slackUserId }, { upsert: true });
+    const bet = await DB.MongoBet.findOne({ code, channelId });
+    const user = await DB.MongoUser.findOneAndUpdate(
+      { slackUserId, channelId },
+      {},
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
     if (!bet || !user) {
+      console.log(bet);
+      console.log(user);
       return await respond({
         response_type: "ephemeral",
         text: "Error joining bet :dingus:",
@@ -38,7 +45,7 @@ export const joinBet: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
 
     if (bet.money > user.money) {
       return await say({
-        text: `<${slackUserId}> tried to join a bet but didn't have enough money :dingus:`,
+        text: `<@${slackUserId}> tried to join a bet but didn't have enough money :dingus:`,
       });
     }
 
@@ -51,6 +58,6 @@ export const joinBet: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
     });
 
     await say({
-      text: `<${slackUserId}> bets ${prediction}`,
+      text: `<@${slackUserId}> bets ${prediction}`,
     });
   };

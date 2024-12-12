@@ -43,6 +43,6 @@ export const startBet: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
       });
     }
     await say({
-      text: `<!channel> <${userId}> started a new bet for $${bet.money}: ${bet.description}. To join: \`/bet ${bet.code} <your prediction>\``,
+      text: `<!channel> <@${userId}> started a new bet for $${bet.money}: ${bet.description}. To join: \`/bet ${bet.code} <your prediction>\``,
     });
   };
