@@ -5,6 +5,6 @@ const UserSchema = new Schema({
   channelId: { type: String, required: true },
   money: { type: Number, required: true },
 });
-Userchema.index({ slackUserId: 1, channelId: 1 }, { unique: true });
+UserSchema.index({ slackUserId: 1, channelId: 1 }, { unique: true });
 const USER_MODEL_NAME = "user";
-export default model(USER_MODEL_NAME, UserSchema);
+export const MongoUser = model(USER_MODEL_NAME, UserSchema);
