@@ -17,6 +17,7 @@ const BetSchema = new Schema({
   description: { type: String, required: true },
   money: { type: Number, required: true },
   userBets: { type: [UserBetSchema], default: [] },
+  paidOut: Boolean,
 });
 
 const BET_MODEL_NAME = "bet";

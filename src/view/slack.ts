@@ -146,7 +146,10 @@ export function PlainText(text: string): Text {
   return { type: "plain_text", text, emoji: true } as Text;
 }
 
-export function Section(text: Text, { accessory }: { accessory?: any } = {}) {
+export function Section(
+  text: Text | ReturnType<typeof Image>,
+  { accessory }: { accessory?: any } = {}
+) {
   if (accessory) return { type: "section", text, accessory };
   return { type: "section", text };
 }

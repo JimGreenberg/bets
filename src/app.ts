@@ -1,7 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { App } from "@slack/bolt";
+import { App, BlockAction, ButtonAction } from "@slack/bolt";
 import * as API from "./api";
+import * as DB from "./mongo";
 
 const BOT_TEST = "C03LZF604RG";
 
@@ -14,6 +15,19 @@ const main = (app: App) => {
     if (API.JOIN_BET_PATTERN.test(args.command.text)) {
       return await API.joinBet(app)(args);
     }
+    if (API.LIST_BETS_PATTERN.test(args.command.text)) {
+      return await API.listBets(app)(args);
+    }
+  });
+
+  app.action<BlockAction<ButtonAction>>("resolve-bet", async (args) => {
+    await args.ack();
+    await API.resolveBet(app)(args);
+  });
+
+  app.action<BlockAction<ButtonAction>>(/fulfil-userbet-/, async (args) => {
+    await args.ack();
+    await API.fulfilUserBet(app)(args);
   });
 };
 

@@ -1,5 +1,6 @@
 import { App, Middleware, SlackCommandMiddlewareArgs } from "@slack/bolt";
 import { Bet } from "../types";
+import * as S from "../view/slack";
 import * as DB from "../mongo";
 import * as Errors from "../error";
 
@@ -58,6 +59,7 @@ export const joinBet: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
     });
 
     await say({
+      blocks: [S.Markdown(`<@${slackUserId}> bets _${prediction}_`)],
       text: `<@${slackUserId}> bets ${prediction}`,
     });
   };
