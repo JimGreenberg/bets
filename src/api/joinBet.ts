@@ -59,7 +59,6 @@ export const joinBet: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
     });
 
     await say({
-      blocks: [S.Markdown(`<@${slackUserId}> bets _${prediction}_`)],
       text: `<@${slackUserId}> bets ${prediction}`,
     });
   };
