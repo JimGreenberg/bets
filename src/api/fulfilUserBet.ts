@@ -46,10 +46,7 @@ export const fulfilUserBet: (
       return await respond({
         replace_original: true,
 
-        blocks: [
-          S.Header(S.PlainText(bet.description)),
-          ..._userBets(bet, slackUsers),
-        ],
+        blocks: _userBets(bet, slackUsers),
         text: `<@${userId}> fulfilled <@${userBet.slackUserId}>'s bet as ${
           fulfilled ? "right" : "wrong"
         }`,

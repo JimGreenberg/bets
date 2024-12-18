@@ -33,9 +33,9 @@ export const resolveBet: (
     const bet: Bet = _bet.toObject({ flattenObjectIds: true });
     const service = new SlackService(app);
     const users = await service.getUsers(channelId);
-    const blocks = _userBets(bet, users);
-    return await say?.({
-      blocks,
+    return await respond({
+      replace_original: true,
+      blocks: _userBets(bet, users),
       text: `<@${userId}> is resolving ${bet.description}`,
     });
   };
