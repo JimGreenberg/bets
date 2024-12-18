@@ -15,11 +15,22 @@ export async function payOutBet(betId: string) {
   }
   const pot = bet.money * bet.userBets.length;
   const winners = bet.userBets.filter(({ fulfilled }) => fulfilled);
-  const payout = pot / winners.length;
+
+  let slackUserIdsToUpdate: string[] = [];
+  let payout = 0;
+  if (winners.length) {
+    payout = pot / winners.length;
+    slackUserIdsToUpdate = winners.map(({ slackUserId }) => slackUserId);
+  } else {
+    // if no winners, refund everyone's money
+    payout = bet.money;
+    slackUserIdsToUpdate = bet.userBets.map(({ slackUserId }) => slackUserId);
+  }
+
   await MongoUser.updateMany(
     {
       channelId: bet.channelId,
-      slackUserId: { $in: winners.map(({ slackUserId }) => slackUserId) },
+      slackUserId: { $in: slackUserIdsToUpdate },
     },
     {
       $inc: { money: payout },
