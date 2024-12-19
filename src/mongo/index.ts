@@ -13,5 +13,5 @@ MongoUser.syncIndexes();
 
 export { MongoBet, MongoUserBet, MongoUser };
 export { createBet } from "./createBet";
-export { updateBet } from "./deleteBet";
+export { updateBet } from "./updateBet";
 export { payOutBet } from "./payOutBet";

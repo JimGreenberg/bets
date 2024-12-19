@@ -27,7 +27,7 @@ const main = (app: App) => {
 
   app.action<BlockAction<ButtonAction>>("cancel-bet", async (args) => {
     await args.ack();
-    await API.canceleBet(app)(args);
+    await API.cancelBet(app)(args);
   });
 
   app.action<BlockAction<ButtonAction>>(/fulfil-userbet-/, async (args) => {
