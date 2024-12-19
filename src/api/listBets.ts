@@ -2,9 +2,50 @@ import { App, Middleware, SlackCommandMiddlewareArgs } from "@slack/bolt";
 import { Bet, UserBet } from "../types";
 import * as DB from "../mongo";
 import * as S from "../view/slack";
-import { SlackService } from "../slackService";
+import { SlackService, User } from "../slackService";
 
 export const LIST_BETS_PATTERN = /^list$/;
+
+export function getListBetBlocks(bets: Bet[], users: User[]) {
+  return bets
+    .map(({ userBets, description, code, money }) => [
+      S.Section(
+        S.PlainText(description),
+        userBets.length
+          ? {
+              accessory: S.Button({
+                text: "Resolve",
+                value: code,
+                action_id: "resolve-bet",
+              }),
+            }
+          : {
+              accessory: S.Button({
+                text: "Cancel",
+                style: "danger",
+                value: code,
+                action_id: "cancel-bet",
+              }),
+            }
+      ),
+      S.Context(
+        S.Markdown(
+          `Wager: $${money} | Join Code: ${code} | Bettors: ${
+            userBets.length ? "" : "None"
+          }`
+        ),
+        ...(userBets.map(({ slackUserId }) => {
+          const slackUser = users.find(({ id }) => id === slackUserId);
+          return S.Image({
+            image_url: slackUser?.image || "",
+            alt_text: slackUser?.name || "",
+          });
+        }) as [ReturnType<typeof S.Image>])
+      ),
+      S.Divider(),
+    ])
+    .flat();
+}
 
 export const listBets: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
   (app: App) =>
@@ -27,37 +68,7 @@ export const listBets: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
     const slackService = new SlackService(app);
     const users = await slackService.getUsers(channelId);
     await say({
-      blocks: bets
-        .map(({ userBets, description, code, money }) => [
-          S.Section(
-            S.PlainText(description),
-            userBets.length
-              ? {
-                  accessory: S.Button({
-                    text: "Resolve",
-                    value: code,
-                    action_id: "resolve-bet",
-                  }),
-                }
-              : {}
-          ),
-          S.Context(
-            S.Markdown(
-              `Wager: $${money} | Join Code: ${code} | Bettors: ${
-                userBets.length ? "" : "None"
-              }`
-            ),
-            ...(userBets.map(({ slackUserId }) => {
-              const slackUser = users.find(({ id }) => id === slackUserId);
-              return S.Image({
-                image_url: slackUser?.image || "",
-                alt_text: slackUser?.name || "",
-              });
-            }) as [ReturnType<typeof S.Image>])
-          ),
-          S.Divider(),
-        ])
-        .flat(),
+      blocks: getListBetBlocks(bets, users),
       text: "list of bets",
     });
   };

@@ -1,7 +1,7 @@
 import { App, RespondFn } from "@slack/bolt";
 import * as DB from "./mongo";
 
-interface User {
+export interface User {
   id: string;
   name: string;
   image: string;
