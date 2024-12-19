@@ -29,13 +29,18 @@ export const listBets: (app: App) => Middleware<SlackCommandMiddlewareArgs> =
     await say({
       blocks: bets
         .map(({ userBets, description, code, money }) => [
-          S.Section(S.PlainText(description), {
-            accessory: S.Button({
-              text: "Resolve",
-              value: code,
-              action_id: "resolve-bet",
-            }),
-          }),
+          S.Section(
+            S.PlainText(description),
+            userBets.length
+              ? {
+                  accessory: S.Button({
+                    text: "Resolve",
+                    value: code,
+                    action_id: "resolve-bet",
+                  }),
+                }
+              : {}
+          ),
           S.Context(
             S.Markdown(
               `Wager: $${money} | Join Code: ${code} | Bettors: ${
