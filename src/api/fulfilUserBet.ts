@@ -56,7 +56,7 @@ export const fulfilUserBet: (
       const users = await DB.MongoUser.find({ channelId });
       const blocks = [];
       blocks.push(S.Header(S.PlainText(bet.description)));
-      bet.userBets.forEach(({ slackUserId, fulfilled }) => {
+      bet.userBets.forEach(({ slackUserId, fulfilled, prediction }) => {
         const slackUser = slackUsers.find(({ id }) => id === slackUserId);
         if (!slackUser) throw new Errors.NotFoundError("slack user");
         const user = users.find((user) => slackUserId === user.slackUserId);
@@ -70,9 +70,9 @@ export const fulfilUserBet: (
             S.Markdown(
               ` ${slackUser.name} ($${user.money}) ${
                 fulfilled ? "won" : "lost"
-              } *$${fulfilled ? payout : bet.money}* for predicting: _${
-                userBet.prediction
-              }_`
+              } *$${
+                fulfilled ? payout : bet.money
+              }* for predicting: _${prediction}_`
             )
           )
         );
