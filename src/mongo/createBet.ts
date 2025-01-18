@@ -1,4 +1,4 @@
-import { MongoBet, UserBet } from "./schemas/bet";
+import { MongoBet } from "./schemas/bet";
 import { Bet } from "../types";
 import * as Errors from "../error";
 
